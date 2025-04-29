@@ -5,20 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using MySqlConnector;
 using System.Windows;
-using System.Xml.Linq;
+using System.Reflection.PortableExecutable;
 
 namespace kursova.Model
 {
-    internal class AuthorDB
+    internal class ReaderDB
     {
         DbConnection connection;
 
-        private AuthorDB(DbConnection db)
+        private ReaderDB(DbConnection db)
         {
             this.connection = db;
         }
 
-        public bool Insert(Author author)
+        public bool Insert(Reader reader)
         {
             bool result = false;
             if (connection == null)
@@ -26,13 +26,14 @@ namespace kursova.Model
 
             if (connection.OpenConnection())
             {
-                MySqlCommand cmd = connection.CreateCommand("insert into `author` Values (0, @Firstname, @Lastname, @Birthday;");
+                MySqlCommand cmd = connection.CreateCommand("insert into `reader` Values (0, @Firstname, @Lastname, @Phone, @Email , @BibliotekaID);");
 
-               
-                cmd.Parameters.Add(new MySqlParameter("Firstname", author.Firstname));
-                cmd.Parameters.Add(new MySqlParameter("Lastname", author.Lastname));
-                cmd.Parameters.Add(new MySqlParameter("Birthday", author.Birthday));
-                
+                cmd.Parameters.Add(new MySqlParameter("Firstname", reader.Firstname));
+                cmd.Parameters.Add(new MySqlParameter("Lastname", reader.Lastname));
+                cmd.Parameters.Add(new MySqlParameter("Phone", reader.Phone));
+                cmd.Parameters.Add(new MySqlParameter("Email", reader.Email));
+                cmd.Parameters.Add(new MySqlParameter("BibliotekaID", reader.BibliotekaID));
+
 
 
                 try
@@ -45,7 +46,7 @@ namespace kursova.Model
                         int id = (int)(ulong)cmd.ExecuteScalar();
                         if (id > 0)
                         {
-                            author.ID = id;
+                            reader.ID = id;
                             result = true;
                         }
                     }
@@ -63,15 +64,15 @@ namespace kursova.Model
             return result;
         }
 
-        internal List<Author> SelectAll()
+        internal List<Reader> SelectAll()
         {
-            List<Author> authors = new List<Author>();
+            List<Reader> reader = new List<Reader>();
             if (connection == null)
-                return authors;
+                return reader;
 
             if (connection.OpenConnection())
             {
-                var command = connection.CreateCommand("select `ID`, `First name`, `Last name`, `Birthday` from `author` ");
+                var command = connection.CreateCommand("select `ID`, `Firstname`, `Lastname`, `Phone`, `Email`, 'BibliotekaID'  from `Reader` ");
                 try
                 {
 
@@ -81,24 +82,26 @@ namespace kursova.Model
                         int id = dr.GetInt32(0);
                         string firstname = string.Empty;
                         if (!dr.IsDBNull(1))
-                            firstname = dr.GetString(1); 
-                        string lastname = string.Empty;
-                        if (!dr.IsDBNull(2))
-                            lastname = dr.GetString(2);
-                        DateOnly birthdate = new DateOnly();
-                        birthdate = dr.GetDateOnly(3);
+                            firstname = dr.GetString(1);
+                        string lastname = dr.GetString(2);
+                        string phone = dr.GetString(3);
+                        string bibliotekaid = dr.GetString(4);
+                        string email = string.Empty;
+                        if (!dr.IsDBNull(4))
+                            email = dr.GetString(5);
 
 
 
 
-
-
-                        authors.Add(new Author
+                        reader.Add(new Reader
                         {
                             ID = id,
                             Firstname = firstname,
                             Lastname = lastname,
-                           Birthday = birthdate
+                            Phone = phone,
+                            Email = email,
+                            BibliotekaID = bibliotekaid,
+
                         });
                     }
                 }
@@ -108,10 +111,10 @@ namespace kursova.Model
                 }
             }
             connection.CloseConnection();
-            return authors;
+            return reader;
         }
 
-        internal bool Update(Author edit)
+        internal bool Update(Reader edit)
         {
             bool result = false;
             if (connection == null)
@@ -119,11 +122,19 @@ namespace kursova.Model
 
             if (connection.OpenConnection())
             {
-                var mc = connection.CreateCommand($"update `author` set ` firstname`=@firstname, ` lastname`=@lastname, ` birthday`=@birthday, `id` = {edit.ID}");
+               
+
+                var mc = connection.CreateCommand($"update `reader` set ` firstname`=@firstname, ` lastname`=@lastname, ` phone`=@phone, ` email`=@email, ` bibliotekaID`=@bibliotekaID,  `id` = {edit.ID}");
                 mc.Parameters.Add(new MySqlParameter("firstname", edit.Firstname));
                 mc.Parameters.Add(new MySqlParameter("lastname", edit.Lastname));
-                mc.Parameters.Add(new MySqlParameter("birthday", edit.Birthday));
-               
+                mc.Parameters.Add(new MySqlParameter("phone", edit.Phone));
+                mc.Parameters.Add(new MySqlParameter("email", edit.Email));
+                mc.Parameters.Add(new MySqlParameter("BibliotekaID", edit.BibliotekaID));
+
+
+
+
+
 
                 try
                 {
@@ -140,7 +151,7 @@ namespace kursova.Model
         }
 
 
-        internal bool Remove(Author remove)
+        internal bool Remove(Reader remove)
         {
             bool result = false;
             if (connection == null)
@@ -150,7 +161,7 @@ namespace kursova.Model
             {
                 ///////
 
-                var mc = connection.CreateCommand($"delete from `author` where `id` = {remove.ID}");
+                var mc = connection.CreateCommand($"delete from `reader` where `id` = {remove.ID}");
                 try
                 {
                     mc.ExecuteNonQuery();
@@ -165,23 +176,24 @@ namespace kursova.Model
             return result;
         }
 
-        static AuthorDB db;
-        public static AuthorDB GetDb()
+        static ReaderDB db;
+        public static ReaderDB GetDb()
         {
             if (db == null)
-                db = new AuthorDB(DbConnection.GetDbConnection());
+                db = new ReaderDB(DbConnection.GetDbConnection());
             return db;
         }
 
-        //internal List<Author> SelectBy(string search)
+        //internal IEnumerable<Reader> SelectBy(string search)
         //{
-        //    List<Author> book = new List<Author>();
+        //    List<Reader> reader = new List<Reader>();
         //    if (connection == null)
-        //        return author;
+        //        return reader;
 
         //    if (connection.OpenConnection())
         //    {
-        //        var command = connection.CreateCommand("select `id`, `firstname`, `lastname` from `author` WHERE `firstname` like @search  or `lastname` like @search ");
+        //        var command = connection.CreateCommand("select `id`, `Firstname`, `Lastname`, `Phone`, `Email` " +
+        //            "``, `Bibliotekaid` from `reader` WHERE `firstname` like @search  or `lastname` like @search  or `phone` like @search or `email` like @search");
         //        try
         //        {
         //            command.Parameters.Add(new MySqlParameter("search", "%" + search + "%"));
@@ -189,24 +201,27 @@ namespace kursova.Model
         //            while (dr.Read())
         //            {
         //                int id = dr.GetInt32(0);
-        //                string Firstname = string.Empty;
+        //                string title = string.Empty;
         //                if (!dr.IsDBNull(1))
-        //                    Firstname = dr.GetString(1);
-        //                int Lastname = dr.GetInt32(2);
-                      
+        //                    title = dr.GetString(1);
+        //                int author = dr.GetInt32(2);
+        //                int year_published = dr.GetInt32(3);
+        //                string genre = string.Empty;
         //                if (!dr.IsDBNull(4))
-        //                    Birthday = dr.GetString(4);
+        //                    genre = dr.GetString(4);
         //                int authorid = dr.GetInt32(5);
 
 
 
 
-        //                book.Add(new Author
+        //                reader.Add(new Reader
         //                {
         //                    ID = id,
         //                    Firstname = firstname,
         //                    Lastname = lastname,
-        //                    Birthday = birthdate
+        //                    Phone = phone,
+        //                    Email = email,
+        //                    BibliotekaID = bibliotekaid,
 
         //                });
         //            }
@@ -217,7 +232,7 @@ namespace kursova.Model
         //        }
         //    }
         //    connection.CloseConnection();
-        //    return author;
+        //    return reader;
         //}
     }
 }
