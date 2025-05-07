@@ -173,52 +173,50 @@ namespace kursova.Model
             return db;
         }
 
-        //internal List<Author> SelectBy(string search)
-        //{
-        //    List<Author> book = new List<Author>();
-        //    if (connection == null)
-        //        return author;
+        internal List<Author> SelectBy(string search)
+        {
+            List<Author> authors = new List<Author>();
+            if (connection == null)
+                return authors;
 
-        //    if (connection.OpenConnection())
-        //    {
-        //        var command = connection.CreateCommand("select `id`, `firstname`, `lastname` from `author` WHERE `firstname` like @search  or `lastname` like @search ");
-        //        try
-        //        {
-        //            command.Parameters.Add(new MySqlParameter("search", "%" + search + "%"));
-        //            MySqlDataReader dr = command.ExecuteReader();
-        //            while (dr.Read())
-        //            {
-        //                int id = dr.GetInt32(0);
-        //                string Firstname = string.Empty;
-        //                if (!dr.IsDBNull(1))
-        //                    Firstname = dr.GetString(1);
-        //                int Lastname = dr.GetInt32(2);
-                      
-        //                if (!dr.IsDBNull(4))
-        //                    Birthday = dr.GetString(4);
-        //                int authorid = dr.GetInt32(5);
+            if (connection.OpenConnection())
+            {
+                var command = connection.CreateCommand("select `id`, `firstname`, `lastname`, 'birthday' from `author` WHERE `firstname` like @search  or `lastname` like @search  or 'birthday' like @search");
+                try
+                {
+                    command.Parameters.Add(new MySqlParameter("search", "%" + search + "%"));
+                    MySqlDataReader dr = command.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        int id = dr.GetInt32(0);
+                        string firstname = string.Empty;
+                        if (!dr.IsDBNull(1))
+                            firstname = dr.GetString(1);
+                        string lastname = dr.GetString(2);   
+                        string birthday = dr.GetString(3);
+                        int authorid = dr.GetInt32(4);
 
 
 
 
-        //                book.Add(new Author
-        //                {
-        //                    ID = id,
-        //                    Firstname = firstname,
-        //                    Lastname = lastname,
-        //                    Birthday = birthdate
+                        authors.Add(new Author
+                        {
+                            ID = id,
+                            Firstname = firstname,
+                            Lastname = lastname,
+                            Birthday = birthday
 
-        //                });
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show(ex.Message);
-        //        }
-        //    }
-        //    connection.CloseConnection();
-        //    return author;
-        //}
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            connection.CloseConnection();
+            return authors;
+        }
     }
 }
 

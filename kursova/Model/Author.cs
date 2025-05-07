@@ -11,7 +11,9 @@ namespace kursova
     {
         public int ID { get; set; }
         public string Lastname { get; set; }
+        public string? LastName { get; internal set; }
         public string Firstname { get; set; }
+        public string? FirstName { get; internal set; }
         public DateOnly Birthday { get; set; }
         public string FIO { get => $"{Lastname} {Firstname}"; }
 

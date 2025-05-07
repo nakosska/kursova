@@ -7,6 +7,56 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Menu>
+                <MenuItem Header="Add a book" Command="{Binding AddBooks}"/>
+                <MenuItem Header="Add a author" Command="{Binding AddAuthor}"/>
+            </Menu>
+            <ListView Grid.Row="1" ItemsSource="{Binding Books}" SelectedItem="{Binding SelectedBooks}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="tittle" Width="150" DisplayMemberBinding="{Binding tittle}"/>
+                        <GridViewColumn Header="year"  Width="50" DisplayMemberBinding="{Binding year_published }"/>
+                        <GridViewColumn Header="genre"  Width="80" DisplayMemberBinding="{Binding genre}"/>
+                        <GridViewColumn Header="available"  Width="80" DisplayMemberBinding="{Binding is_available }"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete"  />
+                    </ContextMenu>
+                </ListView.ContextMenu>
+            </ListView>
+            <StackPanel Grid.Row="1" Grid.Column="1" >
+                <StackPanel DataContext="{Binding SelectedClient}">
+                    <TextBlock Text="Changing the selected record"/>
+                    <TextBlock Text=" tittle"/>
+                    <TextBox Text="{Binding tittle}"/>
 
+                    
+
+                    <TextBlock Text=" genre"/>
+                    <TextBox Text="{Binding genre}"/>
+
+                    <TextBlock Text=" is available"/>
+                    <TextBox Text="{Binding  is_available}"/>
+
+
+                </StackPanel>
+                <Button Content="Save changes" Command="{Binding UpdateBooks}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

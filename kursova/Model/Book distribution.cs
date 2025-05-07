@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace kursova
 {
-    public class Book_distribution
+    public class BookDistribution
     {
         public int Reader_ID { get; set; }
         public int Book_ID { get; set; }
@@ -15,5 +15,6 @@ namespace kursova
         public DateTime Date_of_issue { get; set; }
 
         public DateTime Return_date { get; set; }
+        public int ID { get; internal set; }
     }
 }

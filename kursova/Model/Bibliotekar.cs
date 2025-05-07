@@ -13,6 +13,8 @@ namespace kursova
         public string Firstname { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
+
+        public string Biblioteka_ID { get; set; }
         public string FIO { get => $"{Lastname} {Firstname}"; }
     }
 }
